@@ -1,10 +1,18 @@
 import imaplib
 import email
+import smtplib
+from email.mime.text import MIMEText
 
+#lembre de configurar o gmail para permitir a leitura de e-mails
 FROM_EMAIL = "seuemail@gmail.com" 
-FROM_PWD = "senhaemail"
-SMTP_SERVER = "imap.gmail.com"  #padrão
-SMTP_PORT = 993  #padrão
+FROM_PWD = "senhaEmail"
+TO_ADDRS = ['email_destino@gmail.com'] #email destino
+#configuração para enviar email
+SMTP_SSL_HOST = 'smtp.gmail.com'# padrão
+SMTP_SSL_PORT = 465# padrão
+#configuração para receber e-mail
+SMTP_SERVER = "imap.gmail.com"  # padrão
+SMTP_PORT = 993  # padrão
 
 
 def read_email():
@@ -14,7 +22,7 @@ def read_email():
         mail.login(FROM_EMAIL, FROM_PWD)
         
         #Em mail.select seleciono a caixa de e-mail que quero fazer a leitura, 
-        nesse caso, utilizei “inbox” para leitura dos e-mails. Poswmoa atribuir um label aos e-mails pra isso passamos o parâmetro readonly=False.
+        #nesse caso, utilizei “inbox” para leitura dos e-mails. Ao final vamos atribuir um label aos e-mails pra isso passamos o parâmetro readonly=False.
         mail.select('inbox', readonly=False)
         
         #pesquisa por e-mail (TO), substituir o email para fazer a pesquisa, para usar é só descomentar a linha a baixo e comentar a pesquisa por assunto
@@ -54,10 +62,24 @@ def read_email():
                 else:
                     mail_content = msg.get_payload()
                     
+                #usaremos MIMEText para enviar somente texto
+                message = MIMEText(mail_content)
+                message['subject'] = email_subject #Assunto do nosso email
+                message['from'] = email_from #destino do nosso email
+                message['to'] = ', '.join(TO_ADDRS) #endereço de quem esta enviando o email
+                
+                # Vamos conectar de forma segura, para isso uasaremos SSL
+                server = smtplib.SMTP_SSL(SMTP_SSL_HOST, SMTP_SSL_PORT)
+                
+                #Fazendo login e enviando o e-mail
+                server.login(FROM_EMAIL, FROM_PWD)
+                server.sendmail(FROM_EMAIL, TO_ADDRS, message.as_string())    
+                    
+                #para mostrar o resultado da leitura de emails descomentar as linhas a baixo
                 #aqui imprimimos o conteúdo
-                print('From : ' + email_from + '\n')
-                print('Subject : ' + email_subject + '\n')
-                print('Content: {}'.format(mail_content))
+                #print('From : ' + email_from + '\n')
+                #print('Subject : ' + email_subject + '\n')
+                #print('Content: {}'.format(mail_content))
                 
                 #Aqui é onde é feito a adição do label ao e-mail, substitua label-email
                 mail.store(str.encode(str(i)), '+X-GM-LABELS', 'label-email')
