@@ -73,7 +73,10 @@ def read_email():
                 
                 #Fazendo login e enviando o e-mail
                 server.login(FROM_EMAIL, FROM_PWD)
-                server.sendmail(FROM_EMAIL, TO_ADDRS, message.as_string())    
+                server.sendmail(FROM_EMAIL, TO_ADDRS, message.as_string())
+                
+                #chama nossa função de log enviando o e-mail que geramos
+                logScript(mail_content)
                     
                 #para mostrar o resultado da leitura de emails descomentar as linhas a baixo
                 #aqui imprimimos o conteúdo
@@ -90,6 +93,48 @@ def read_email():
     except Exception as e:
         print(e)
 
+#função que recebe um parametro e imprime ele no final de um arquivo de log
+def logScript(corpoEmail):
+    #pega o horário atual
+    dateTimeObj = datetime.now()
+    #transforma em string e no formato dia/ano e horario da execução
+    stringNow = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S)")
+    
+    #define o nome do arquivo
+    nomeArquivo = ('Log.txt')
+    #abre ele para leitura
+    arquivo = open(nomeArquivo, "r")
+    #le todos as linhas do arquivo
+    txtArq = arquivo.readlines()
+    #colocamos o horário que o log foi gerado
+    txtArq.append('\n Horário Log: ' + stringNow +'\n')
+    #adiciona nosso log
+    txtArq.append(corpoEmail)
+    #abre o arquivo para gravação
+    arquivo = open(nomeArquivo, 'w')
+    #grava o nosso log no arquivo
+    arquivo.writelines(txtArq)
+    #fecha o arquivo
+    arquivo.close()
+
+    return()
+
+#Fução para fazer o script rodar de tempo em tempo
+def setInterval(function, interval, *params, **kwparams):
+    def setTimer(wrapper):
+        wrapper.timer = Timer(interval, wrapper)
+        wrapper.timer.start()
+
+    def wrapper():
+        function(*params, **kwparams)
+        setTimer(wrapper)
+    
+    setTimer(wrapper)
+    return wrapper
+
+def clearInterval(wrapper):
+    wrapper.timer.cancel()
 
 if __name__ == '__main__':
-    read_email()
+    #faz o script rodar a cada 120seg
+    interval_monitor = setInterval(read_email, 120)
