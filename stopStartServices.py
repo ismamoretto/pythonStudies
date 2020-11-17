@@ -45,6 +45,11 @@ def stopStartService():
     # stop the service
     args = ['sc', 'stop', nomeServico]
     result = subprocess.run(args)
+    #para a execução do codigo por 10 segundos para dar tempo do windows parar o serviço
+    time.sleep(10)
+    #sobe o serviço novamente
+    args = ['sc', 'start', nomeServico]
+    result = subprocess.run(args)
   else:
     #se o serviço não estiver rodando, ele vai iniciar o serviço
     print('Entrou Start')
