@@ -15,13 +15,13 @@ nomeServico= 'Nome do Serviço'
 
 #Busca as informações do serviço e retorna elas
 def getService():
-    service = None
+    servico = None
     try:
-        service = psutil.win_service_get(nomeServico)
-        service = service.as_dict()
+        servico = psutil.win_service_get(nomeServico)
+        servico = servico.as_dict()
     except Exception as ex:
         print(str(ex))
-    return service
+    return servico
 
 #função que vai fazer o serviço parar e subir novamente
 def stopStartService():
@@ -35,28 +35,21 @@ def stopStartService():
     os.system("shutdown /r /t 1")
   
   #se nao for 23:59 chama a função para capturar as informações do serviço
-  service = getService()
-
-  if service:
-      print("service found")
-  else:
-      print("service not found")
-
+  servico = getService()
   #se o serviço estiver rodando ele vai estopar o srviço
-  if service and service['status'] == 'running':
-    # stop the service
+  if servico and servico['status'] == 'running':
+    #para o serviço
     args = ['sc', 'stop', nomeServico]
-    result = subprocess.run(args)
+    executa = subprocess.run(args)
     #para a execução do codigo por 10 segundos para dar tempo do windows parar o serviço
     time.sleep(10)
     #sobe o serviço novamente
     args = ['sc', 'start', nomeServico]
-    result = subprocess.run(args)
+    executa = subprocess.run(args)
   else:
     #se o serviço não estiver rodando, ele vai iniciar o serviço
-    print('Entrou Start')
     args = ['sc', 'start', nomeServico]
-    result = subprocess.run(args)
+    executa = subprocess.run(args)
     
 def logExecucao():
     #captura o horário atual
