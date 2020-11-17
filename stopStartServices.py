@@ -25,6 +25,8 @@ def getService():
 
 #função que vai fazer o serviço parar e subir novamente
 def stopStartService():
+  #chama função para gravar log de execução do programa
+  logExecucao()
   #captura a hora atual do computador
   now = datetime.now()
   #se a hora for 23 e o minuto for 59
@@ -55,6 +57,28 @@ def stopStartService():
     print('Entrou Start')
     args = ['sc', 'start', nomeServico]
     result = subprocess.run(args)
+    
+def logExecucao():
+    #captura o horário atual
+    dateTimeObj = datetime.now()
+    #formata o horário
+    stringNow = dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S)")
+    #procura o arquivo
+    nomeArquivo = ('nome do seu arquivo de log')
+    #abre o arquivo para leitura
+    arquivo = open(nomeArquivo, "r")
+    #le todas as linhas do programa e grava numa strig
+    txtArq = arquivo.readlines()
+    #grava na string uma linha nova com o horário atual
+    txtArq.append('\n Última Leitura: ' + stringNow)
+    #abre o arquivo para a leitura
+    arquivo = open(nomeArquivo, 'w')
+    #grava no arquivo a string
+    arquivo.writelines(txtArq)
+    #fecha o arquivo
+    arquivo.close()
+
+    return()
 
 def setInterval(function, interval, *params, **kwparams):
     def setTimer(wrapper):
@@ -72,5 +96,6 @@ def clearInterval(wrapper):
     wrapper.timer.cancel()
 
 if __name__ == '__main__':
+    #aqui você define, em segundos, quanto em quanto tempo seu script vai rodar, nesse caso o script roda uma vez a cada 3600 segundos
     interval_monitor = setInterval(stopStartService, 3600)
 
