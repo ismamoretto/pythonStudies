@@ -14,7 +14,7 @@ executar este comando no cmder: python -m pip install psutil
 nomeServico= 'Nome do Serviço'
 
 #Busca as informações do serviço e retorna elas
-def getService():
+def serviceGet():
     servico = None
     try:
         servico = psutil.win_service_get(nomeServico)
@@ -28,14 +28,14 @@ def stopStartService():
   #chama função para gravar log de execução do programa
   logExecucao()
   #captura a hora atual do computador
-  now = datetime.now()
+  horaAtual = datetime.now()
   #se a hora for 23 e o minuto for 59
-  if ( now.hour == 23 and now.minute == 59):
+  if ( horaAtual.hour == 23 and horaAtual.minute == 59):
     #o computador vai ser reiniciado, você pode desligar o computador substituindo o /r por /s
     os.system("shutdown /r /t 1")
   
   #se nao for 23:59 chama a função para capturar as informações do serviço
-  servico = getService()
+  servico = serviceGet()
   #se o serviço estiver rodando ele vai estopar o srviço
   if servico and servico['status'] == 'running':
     #para o serviço
@@ -73,7 +73,7 @@ def logExecucao():
 
     return()
 
-def setInterval(function, interval, *params, **kwparams):
+def defineIntervalo(function, interval, *params, **kwparams):
     def setTimer(wrapper):
         wrapper.timer = Timer(interval, wrapper)
         wrapper.timer.start()
@@ -90,5 +90,5 @@ def clearInterval(wrapper):
 
 if __name__ == '__main__':
     #aqui você define, em segundos, quanto em quanto tempo seu script vai rodar, nesse caso o script roda uma vez a cada 3600 segundos
-    interval_monitor = setInterval(stopStartService, 3600)
+    interval_monitor = defineIntervalo(stopStartService, 3600)
 
